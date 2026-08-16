@@ -1,7 +1,7 @@
-From 985c6fa7b396171223aa9d8f70ca83b82c178cc3 Mon Sep 17 00:00:00 2001
+From 37724d835594edb18498458c9fa45077511ff4df Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Fri, 14 Aug 2026 16:32:03 +0000
-Subject: [PATCH] Revert "Settings: support per-app volume [3/3]"
+Subject: [PATCH 4/4] Revert "Settings: support per-app volume [3/3]"
 
 Drop the Settings-side App Volume panel/slice leftover after the
 frameworks per-app volume reverts.
@@ -35,7 +35,7 @@ index b889263599e..bc42977be44 100644
  
          <activity android:name=".wifi.addappnetworks.AddAppNetworksActivity"
 diff --git a/res/values/evolution_strings.xml b/res/values/evolution_strings.xml
-index a71fe77cf24..d33835391e2 100644
+index 2094ef8ae9a..0d903ffd51f 100644
 --- a/res/values/evolution_strings.xml
 +++ b/res/values/evolution_strings.xml
 @@ -179,11 +179,6 @@

@@ -1,4 +1,4 @@
-From 694a4b5b6601fc172a1cfba6230c83132fe3ed77 Mon Sep 17 00:00:00 2001
+From 95c9ff773fb59e74c2423661dc0652f95ee2a578 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Fri, 14 Aug 2026 16:31:01 +0000
 Subject: [PATCH] libc: port ferrari hide extras onto Evolution-X cnb

@@ -1,4 +1,4 @@
-From a2d2e0242b05ec1b5cf63711ebf140007a435ee0 Mon Sep 17 00:00:00 2001
+From 5b01ea0d430a4567b20ab7fa35ae3c27e42a92d8 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Mon, 10 Aug 2026 10:11:36 +0000
 Subject: [PATCH 2/2] libaudiobase: export legacy device connection symbol
@@ -8,7 +8,7 @@ Subject: [PATCH 2/2] libaudiobase: export legacy device connection symbol
  1 file changed, 4 insertions(+)
 
 diff --git a/media/libaudioclient/Android.bp b/media/libaudioclient/Android.bp
-index efd550d46f..d465cb2196 100644
+index df84cfec4c..ab358ed8fa 100644
 --- a/media/libaudioclient/Android.bp
 +++ b/media/libaudioclient/Android.bp
 @@ -136,6 +136,10 @@ cc_defaults {

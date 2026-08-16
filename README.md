@@ -27,7 +27,11 @@ originate here and are pushed to the `bubundas17` forks.
 | `lineage.dependencies` | Repo dependencies (sm8450-common, kernel, vendor) |
 | `manifest.xml` | Repo manifest snippet for this device |
 
-## Related repositories (all under `bubundas17`, branch `ferrari-fixes`)
+## Related repositories (all under `bubundas17`)
+
+Current Android 17 / Evolution X 12.1 work is on `Evolution-X-v12.1-Android-17`.
+The pre-repo-sync 12.0 tree is `Evolution-X-v12.0-Beta` and includes the
+working UDFPS path.
 
 - [android_device_oneplus_sm8450-common](https://github.com/bubundas17/android_device_oneplus_sm8450-common) — common device tree (audio config, sepolicy, blobs)
 - [android_kernel_oneplus_sm8450](https://github.com/bubundas17/android_kernel_oneplus_sm8450) — kernel 5.10 (waipio)
@@ -88,7 +92,8 @@ service integration cleanup, Clang init fixes, **double-tap-to-wake
 Two kinds of changes, two routes — never mix them:
 
 1. **Device-specific fixes** → commit and push directly to this repo
-   (and the `sm8450-common` / devicetrees forks), branch `ferrari-fixes`.
+   (and the `sm8450-common` / devicetrees forks), branch
+   `Evolution-X-v12.1-Android-17` (12.0 snapshot: `Evolution-X-v12.0-Beta`).
 2. **Any other file (ROM sources)** → commit locally, regenerate the patch
    set with `make-patches.sh`, then commit and push the regenerated patches
    here. Never rely on loose unversioned ROM-tree edits.

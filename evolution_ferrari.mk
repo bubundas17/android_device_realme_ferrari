@@ -14,10 +14,15 @@ $(call inherit-product, device/realme/ferrari/device.mk)
 # Inherit Evolution X common config
 $(call inherit-product, vendor/lineage/config/common_full_phone.mk)
 
-# Drop stale A16 Flex clock. Pixel CP2A dumps no longer ship it, and loading
-# the leftover plugin crashes Wallpaper & styles with:
-#   InvalidVersionException: Missing required dependency ClockProviderPlugin
-PRODUCT_PACKAGES := $(filter-out SystemUIClocks-Flex,$(PRODUCT_PACKAGES))
+# Drop packages that break ferrari bring-up after the Evolution-X 12.1 sync.
+# Google WebApp is also disabled in Soong (BoardConfig evo_ferrari) because
+# prefer+overrides still installs it when only PRODUCT_PACKAGES is filtered.
+PRODUCT_PACKAGES := $(filter-out \
+    SystemUIClocks-Flex \
+    com.google.android.webapp \
+    LMOFreeform \
+    LMOFreeformSidebar \
+    ,$(PRODUCT_PACKAGES))
 
 PRODUCT_NAME := evolution_ferrari
 PRODUCT_DEVICE := ferrari

@@ -1,4 +1,4 @@
-From 537a2b8fb1c37d7cfe66ff20153651eb33f80371 Mon Sep 17 00:00:00 2001
+From c8d64d765f5360c7ea98e7557e253136ce766f30 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Mon, 10 Aug 2026 10:11:36 +0000
 Subject: [PATCH] audio: always initialize A2DP source offload

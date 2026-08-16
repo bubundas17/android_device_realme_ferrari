@@ -1,4 +1,4 @@
-From ab9b1863156284def569cc668ae69136f73bc0ca Mon Sep 17 00:00:00 2001
+From d13df2a31e5667e98251f34de0a7ee0d4cb344fc Mon Sep 17 00:00:00 2001
 From: Atakan <ata.kaner03@gmail.com>
 Date: Fri, 6 Dec 2024 12:30:45 +0300
 Subject: [PATCH 1/4] sdm: Support Samsung FINGERPRINT_MASK DRM property
@@ -19,7 +19,7 @@ Change-Id: I200d06d1e17dbad55715d4fc8e1ce812ff0f0ec9
  8 files changed, 81 insertions(+)
 
 diff --git a/Android.bp b/Android.bp
-index 18cdebdc..b96f7aee 100644
+index 18cdebdc68..b96f7aee02 100644
 --- a/Android.bp
 +++ b/Android.bp
 @@ -8,6 +8,7 @@ soong_config_module_type {
@@ -45,7 +45,7 @@ index 18cdebdc..b96f7aee 100644
  }
  
 diff --git a/libdrmutils/drm_interface.h b/libdrmutils/drm_interface.h
-index 8814e6b9..1291b994 100644
+index 8814e6b9cd..1291b9944b 100644
 --- a/libdrmutils/drm_interface.h
 +++ b/libdrmutils/drm_interface.h
 @@ -505,6 +505,14 @@ enum struct DRMOps {
@@ -64,7 +64,7 @@ index 8814e6b9..1291b994 100644
  
  enum struct DRMRotation {
 diff --git a/sde-drm/drm_atomic_req.cpp b/sde-drm/drm_atomic_req.cpp
-index cdf77c16..fceb7508 100644
+index cdf77c1656..fceb7508b2 100644
 --- a/sde-drm/drm_atomic_req.cpp
 +++ b/sde-drm/drm_atomic_req.cpp
 @@ -130,6 +130,9 @@ int DRMAtomicReq::Perform(DRMOps opcode, uint32_t obj_id, ...) {
@@ -78,7 +78,7 @@ index cdf77c16..fceb7508 100644
        drm_mgr_->GetConnectorMgr()->Perform(opcode, obj_id, drm_atomic_req_, args);
      } break;
 diff --git a/sde-drm/drm_connector.cpp b/sde-drm/drm_connector.cpp
-index ba29c81b..a2c82316 100644
+index ba29c81b7c..a2c82316b9 100644
 --- a/sde-drm/drm_connector.cpp
 +++ b/sde-drm/drm_connector.cpp
 @@ -1276,6 +1276,24 @@ void DRMConnector::Perform(DRMOps code, drmModeAtomicReq *req, va_list args) {
@@ -107,7 +107,7 @@ index ba29c81b..a2c82316 100644
      default:
        DRM_LOGE("Invalid opcode %d to set on connector %d", code, obj_id);
 diff --git a/sde-drm/drm_property.cpp b/sde-drm/drm_property.cpp
-index 5de330ce..1f789f53 100644
+index 5de330ce95..1f789f531f 100644
 --- a/sde-drm/drm_property.cpp
 +++ b/sde-drm/drm_property.cpp
 @@ -180,6 +180,9 @@ DRMProperty DRMPropertyManager::GetPropertyEnum(const std::string &name) const {
@@ -121,7 +121,7 @@ index 5de330ce..1f789f53 100644
    return DRMProperty::INVALID;
  }
 diff --git a/sde-drm/drm_property.h b/sde-drm/drm_property.h
-index aee72beb..08d278af 100644
+index aee72beb60..08d278af34 100644
 --- a/sde-drm/drm_property.h
 +++ b/sde-drm/drm_property.h
 @@ -185,6 +185,9 @@ enum struct DRMProperty {
@@ -135,7 +135,7 @@ index aee72beb..08d278af 100644
    // Insert above
    MAX
 diff --git a/sdm/libs/core/drm/hw_device_drm.cpp b/sdm/libs/core/drm/hw_device_drm.cpp
-index 04cc73bf..a1eee4ff 100644
+index 04cc73bfce..a1eee4fff6 100644
 --- a/sdm/libs/core/drm/hw_device_drm.cpp
 +++ b/sdm/libs/core/drm/hw_device_drm.cpp
 @@ -1227,6 +1227,17 @@ DisplayError HWDeviceDRM::PowerOff(bool teardown, SyncPoints *sync_points) {
@@ -188,7 +188,7 @@ index 04cc73bf..a1eee4ff 100644
      if (IsFullFrameUpdate(*hw_layers_info)) {
        ResetROI();
 diff --git a/sdm/libs/core/drm/hw_device_drm.h b/sdm/libs/core/drm/hw_device_drm.h
-index 5fc3dd68..613a9f85 100644
+index 5fc3dd6875..613a9f85ba 100644
 --- a/sdm/libs/core/drm/hw_device_drm.h
 +++ b/sdm/libs/core/drm/hw_device_drm.h
 @@ -361,6 +361,9 @@ class HWDeviceDRM : public HWInterface {

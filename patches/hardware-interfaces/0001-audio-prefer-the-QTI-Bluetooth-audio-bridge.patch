@@ -1,4 +1,4 @@
-From 13d4bac76b3e8db8d6ae9602a4311fdf54443593 Mon Sep 17 00:00:00 2001
+From 99828d98c481946066aa29ad9d6f0a01e123496f Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Mon, 10 Aug 2026 10:11:36 +0000
 Subject: [PATCH] audio: prefer the QTI Bluetooth audio bridge

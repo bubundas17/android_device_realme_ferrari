@@ -1,4 +1,4 @@
-From e5e6419a6a27b8493e1c574a0f848a23f174b9a4 Mon Sep 17 00:00:00 2001
+From bf070c2a9af2fad4d0c060dc0d5c81fbc40ee3d9 Mon Sep 17 00:00:00 2001
 From: pjgowtham <pjgowtham@gmail.com>
 Date: Thu, 8 May 2025 00:16:06 +0530
 Subject: [PATCH 3/4] sdm: Support pixelworks soft iris color calibration
@@ -30,7 +30,7 @@ Change-Id: I76d135eef8f0240f5d8f0316d2c4f0679d38c61c
  create mode 100644 include/pxlw_iris_wrapper.h
 
 diff --git a/composer/Android.bp b/composer/Android.bp
-index 918dd5e9..1e847ba4 100644
+index 918dd5e935..1e847ba419 100644
 --- a/composer/Android.bp
 +++ b/composer/Android.bp
 @@ -21,7 +21,12 @@ cc_binary {
@@ -63,7 +63,7 @@ index 918dd5e9..1e847ba4 100644
      static_libs: [
          "libaidlcommonsupport",
 diff --git a/composer/hwc_display_builtin.cpp b/composer/hwc_display_builtin.cpp
-index d9c644ef..9c9d513f 100644
+index 3cb99502db..a8b025bef2 100644
 --- a/composer/hwc_display_builtin.cpp
 +++ b/composer/hwc_display_builtin.cpp
 @@ -481,6 +481,16 @@ HWC2::Error HWCDisplayBuiltIn::SetColorModeWithRenderIntent(ColorMode mode, Rend
@@ -84,7 +84,7 @@ index d9c644ef..9c9d513f 100644
    return status;
  }
 diff --git a/composer/hwc_display_builtin.h b/composer/hwc_display_builtin.h
-index 3fa946f4..d470a22c 100644
+index 3fa946f4cf..d470a22cc7 100644
 --- a/composer/hwc_display_builtin.h
 +++ b/composer/hwc_display_builtin.h
 @@ -49,6 +49,7 @@
@@ -96,7 +96,7 @@ index 3fa946f4..d470a22c 100644
  namespace sdm {
  
 diff --git a/composer/hwc_session.cpp b/composer/hwc_session.cpp
-index 32e671a1..46658a6c 100644
+index 32e671a1f4..46658a6c04 100644
 --- a/composer/hwc_session.cpp
 +++ b/composer/hwc_session.cpp
 @@ -2719,6 +2719,19 @@ int HWCSession::CreatePrimaryDisplay() {
@@ -120,7 +120,7 @@ index 32e671a1..46658a6c 100644
          DLOGE("Primary display creation has failed! status = %d", status);
          return status;
 diff --git a/composer/hwc_session.h b/composer/hwc_session.h
-index 270275e9..99474dc2 100644
+index 270275e9be..99474dc209 100644
 --- a/composer/hwc_session.h
 +++ b/composer/hwc_session.h
 @@ -62,6 +62,9 @@
@@ -135,7 +135,7 @@ index 270275e9..99474dc2 100644
  using android::hardware::hidl_handle;
 diff --git a/include/pxlw_iris_feature.h b/include/pxlw_iris_feature.h
 new file mode 100644
-index 00000000..69dab44b
+index 0000000000..69dab44bc7
 --- /dev/null
 +++ b/include/pxlw_iris_feature.h
 @@ -0,0 +1,36 @@
@@ -177,7 +177,7 @@ index 00000000..69dab44b
 +}  // namespace pxlw
 diff --git a/include/pxlw_iris_wrapper.h b/include/pxlw_iris_wrapper.h
 new file mode 100644
-index 00000000..97d66c8d
+index 0000000000..97d66c8da9
 --- /dev/null
 +++ b/include/pxlw_iris_wrapper.h
 @@ -0,0 +1,48 @@
@@ -230,7 +230,7 @@ index 00000000..97d66c8d
 +
 +} // namespace pxlw
 diff --git a/sdm/libs/core/Android.bp b/sdm/libs/core/Android.bp
-index 9adf940c..a9b93fc4 100644
+index 9adf940c3b..a9b93fc462 100644
 --- a/sdm/libs/core/Android.bp
 +++ b/sdm/libs/core/Android.bp
 @@ -16,7 +16,12 @@ cc_library_shared {
@@ -262,7 +262,7 @@ index 9adf940c..a9b93fc4 100644
      srcs: [
          "core_interface.cpp",
 diff --git a/sdm/libs/core/color_manager.cpp b/sdm/libs/core/color_manager.cpp
-index ca2de686..dcfe764d 100644
+index ca2de686fc..dcfe764d3f 100644
 --- a/sdm/libs/core/color_manager.cpp
 +++ b/sdm/libs/core/color_manager.cpp
 @@ -39,6 +39,32 @@
@@ -351,7 +351,7 @@ index ca2de686..dcfe764d 100644
 +
  }  // namespace sdm
 diff --git a/sdm/libs/core/color_manager.h b/sdm/libs/core/color_manager.h
-index deb75459..2b25674b 100644
+index deb7545921..2b25674bd4 100644
 --- a/sdm/libs/core/color_manager.h
 +++ b/sdm/libs/core/color_manager.h
 @@ -45,6 +45,10 @@

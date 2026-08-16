@@ -1,4 +1,4 @@
-From 42d4b831679f4f072970f6631efb3ffa8cbf767b Mon Sep 17 00:00:00 2001
+From 83089eb20ff7ae4c6a88ab5cb608e24d01eda719 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 12 Aug 2026 05:15:01 +0000
 Subject: [PATCH] msdl: use calibrated prebaked fallbacks on LRA devices

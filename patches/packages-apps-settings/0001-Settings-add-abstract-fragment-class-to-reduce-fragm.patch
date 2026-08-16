@@ -1,0 +1,76 @@
+From e1e8080efdcd72aecde97ed679522fae494c77d6 Mon Sep 17 00:00:00 2001
+From: rmp22 <195054967+rmp22@users.noreply.github.com>
+Date: Thu, 11 Sep 2025 09:52:36 +0900
+Subject: [PATCH 1/4] Settings: add abstract fragment class to reduce fragments
+ boilerplate
+
+Change-Id: I7abc1f6a59419eecb5c6616a66e12e524d2af1a1
+Signed-off-by: rmp22 <195054967+rmp22@users.noreply.github.com>
+Signed-off-by: Pranav Vashi <neobuddy89@gmail.com>
+Signed-off-by: Ghosuto <clash.raja10@gmail.com>
+---
+ .../preferences/BasePreferenceFragment.kt     | 39 +++++++++++++++++++
+ .../search/SearchIndexProviderHolder.java     |  5 +++
+ 2 files changed, 44 insertions(+)
+ create mode 100644 src/com/android/settings/preferences/BasePreferenceFragment.kt
+ create mode 100644 src/com/android/settings/search/SearchIndexProviderHolder.java
+
+diff --git a/src/com/android/settings/preferences/BasePreferenceFragment.kt b/src/com/android/settings/preferences/BasePreferenceFragment.kt
+new file mode 100644
+index 00000000000..5c67fc490cb
+--- /dev/null
++++ b/src/com/android/settings/preferences/BasePreferenceFragment.kt
+@@ -0,0 +1,39 @@
++/*
++ * Copyright (C) 2025 AxionOS Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package com.android.settings.preferences
++
++import android.os.Bundle
++import androidx.annotation.XmlRes
++import com.android.internal.logging.nano.MetricsProto
++import com.android.settings.SettingsPreferenceFragment
++import com.android.settings.search.BaseSearchIndexProvider
++import com.android.settings.search.SearchIndexProviderHolder
++
++abstract class BasePreferenceFragment(
++    @XmlRes private val prefResId: Int
++) : SettingsPreferenceFragment(), SearchIndexProviderHolder {
++
++    override fun onCreate(savedInstanceState: Bundle?) {
++        super.onCreate(savedInstanceState)
++        addPreferencesFromResource(prefResId)
++    }
++
++    override fun getMetricsCategory(): Int = MetricsProto.MetricsEvent.VIEW_UNKNOWN
++
++    override fun getSearchIndexProvider(): BaseSearchIndexProvider {
++        return object : BaseSearchIndexProvider(prefResId) {}
++    }
++}
+diff --git a/src/com/android/settings/search/SearchIndexProviderHolder.java b/src/com/android/settings/search/SearchIndexProviderHolder.java
+new file mode 100644
+index 00000000000..e9b37d9234a
+--- /dev/null
++++ b/src/com/android/settings/search/SearchIndexProviderHolder.java
+@@ -0,0 +1,5 @@
++package com.android.settings.search;
++
++public interface SearchIndexProviderHolder {
++    BaseSearchIndexProvider getSearchIndexProvider();
++}
+-- 
+2.43.0
+

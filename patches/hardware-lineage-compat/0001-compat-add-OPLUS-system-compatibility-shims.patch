@@ -1,4 +1,4 @@
-From 8c83feb21b6fb41e1fd94522253916db08760cd4 Mon Sep 17 00:00:00 2001
+From 1f6a277ea1a104d251bbe11f927b5efc06e18a13 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Mon, 10 Aug 2026 10:11:36 +0000
 Subject: [PATCH] compat: add OPLUS system compatibility shims
@@ -10,10 +10,10 @@ Subject: [PATCH] compat: add OPLUS system compatibility shims
  3 files changed, 55 insertions(+)
 
 diff --git a/Android.bp b/Android.bp
-index e70dce1..1565343 100644
+index c67716f..951f3e5 100644
 --- a/Android.bp
 +++ b/Android.bp
-@@ -307,6 +307,16 @@ cc_library {
+@@ -310,6 +310,16 @@ cc_library {
      system_ext_specific: true,
  }
  
@@ -30,7 +30,7 @@ index e70dce1..1565343 100644
  cc_library {
      name: "libgui_shim_vendor",
      defaults: ["libgui_shim_defaults"],
-@@ -577,6 +587,7 @@ cc_library_shared {
+@@ -580,6 +590,7 @@ cc_library_shared {
      shared_libs: [
          "android.media.audio.common.types-V5-cpp",
          "audioclient-types-aidl-cpp",
@@ -38,7 +38,7 @@ index e70dce1..1565343 100644
          "libaudioclient",
          "libaudiofoundation",
          "libutils",
-@@ -845,6 +856,30 @@ cc_prebuilt_library_shared {
+@@ -919,6 +930,30 @@ cc_prebuilt_library_shared {
      compile_multilib: "both",
  }
  
@@ -69,7 +69,7 @@ index e70dce1..1565343 100644
  cc_prebuilt_library_shared {
      name: "libprotobuf-cpp-lite-vendorcompat",
      stem: "libprotobuf-cpp-lite",
-@@ -866,6 +901,26 @@ cc_prebuilt_library_shared {
+@@ -940,6 +975,26 @@ cc_prebuilt_library_shared {
      compile_multilib: "both",
  }
  

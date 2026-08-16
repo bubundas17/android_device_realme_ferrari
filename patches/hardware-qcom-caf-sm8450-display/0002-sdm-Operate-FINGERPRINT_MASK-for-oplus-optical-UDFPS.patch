@@ -1,4 +1,4 @@
-From d4ab432cedb33d02c568f5e4e45256d1b10b2571 Mon Sep 17 00:00:00 2001
+From f5c5669935eb1ea9eb05f8cd9684b4bcb23b9454 Mon Sep 17 00:00:00 2001
 From: pjgowtham <pjgowtham@gmail.com>
 Date: Thu, 22 May 2025 12:46:34 +0530
 Subject: [PATCH 2/4] sdm: Operate FINGERPRINT_MASK for oplus optical UDFPS
@@ -30,7 +30,7 @@ Change-Id: I9fcb119bbebf44b2cd13fb465c09cd9d332013ed
  3 files changed, 47 insertions(+), 1 deletion(-)
 
 diff --git a/Android.bp b/Android.bp
-index b96f7aee..63b3fa94 100644
+index b96f7aee02..63b3fa9461 100644
 --- a/Android.bp
 +++ b/Android.bp
 @@ -8,6 +8,7 @@ soong_config_module_type {
@@ -66,7 +66,7 @@ index b96f7aee..63b3fa94 100644
              cflags: [
                  "-DCONNECTOR_PROP_UDFPS",
 diff --git a/sde-drm/drm_property.cpp b/sde-drm/drm_property.cpp
-index 1f789f53..602356bd 100644
+index 1f789f531f..602356bd9c 100644
 --- a/sde-drm/drm_property.cpp
 +++ b/sde-drm/drm_property.cpp
 @@ -181,7 +181,7 @@ DRMProperty DRMPropertyManager::GetPropertyEnum(const std::string &name) const {
@@ -79,7 +79,7 @@ index 1f789f53..602356bd 100644
  
    return DRMProperty::INVALID;
 diff --git a/sdm/libs/core/drm/hw_device_drm.cpp b/sdm/libs/core/drm/hw_device_drm.cpp
-index a1eee4ff..04ae0763 100644
+index a1eee4fff6..04ae076386 100644
 --- a/sdm/libs/core/drm/hw_device_drm.cpp
 +++ b/sdm/libs/core/drm/hw_device_drm.cpp
 @@ -106,6 +106,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

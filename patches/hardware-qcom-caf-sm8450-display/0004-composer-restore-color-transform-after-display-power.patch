@@ -1,4 +1,4 @@
-From a0d53086fac8e40a00193d1e42cd24972cbcb479 Mon Sep 17 00:00:00 2001
+From 84a5b44ba54a78ac57216e88a404fe64437c6cdc Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 12 Aug 2026 17:33:12 +0000
 Subject: [PATCH 4/4] composer: restore color transform after display power-on
@@ -13,7 +13,7 @@ Co-authored-by: Cursor <cursoragent@cursor.com>
  1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/composer/hwc_display.cpp b/composer/hwc_display.cpp
-index 5965704a..dbd25938 100644
+index 5965704a96..dbd259388a 100644
 --- a/composer/hwc_display.cpp
 +++ b/composer/hwc_display.cpp
 @@ -983,7 +983,8 @@ HWC2::Error HWCDisplay::SetPowerMode(HWC2::PowerMode mode, bool teardown) {

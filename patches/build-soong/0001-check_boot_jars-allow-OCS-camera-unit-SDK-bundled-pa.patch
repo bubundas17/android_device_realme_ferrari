@@ -1,4 +1,4 @@
-From ed13031f597b35612f14462cac02612b391f5516 Mon Sep 17 00:00:00 2001
+From 79c2556bdad5dfc81aa218d2d7c45b18d2d3ffe5 Mon Sep 17 00:00:00 2001
 From: bubundas17 <bubundas17@users.noreply.github.com>
 Date: Sun, 9 Aug 2026 06:58:57 +0000
 Subject: [PATCH] check_boot_jars: allow OCS camera unit SDK bundled packages
@@ -8,7 +8,7 @@ Subject: [PATCH] check_boot_jars: allow OCS camera unit SDK bundled packages
  1 file changed, 14 insertions(+)
 
 diff --git a/scripts/check_boot_jars/package_allowed_list.txt b/scripts/check_boot_jars/package_allowed_list.txt
-index bca7fdab1..82f2d19ed 100644
+index 699b52d9f..74157fe15 100644
 --- a/scripts/check_boot_jars/package_allowed_list.txt
 +++ b/scripts/check_boot_jars/package_allowed_list.txt
 @@ -238,6 +238,20 @@ com.oneplus.*

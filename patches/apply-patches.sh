@@ -14,7 +14,7 @@
 #     block new patches. Forks without those refs keep the current HEAD.
 #   - Patches already applied (same commit subject in history) are skipped.
 #   - If the newest patch in a directory is already in history (typical
-#     for bubundas17 ferrari-fixes forks, or a depth=1 clone of them),
+#     for bubundas17 Evolution-X-v12.1-Android-17 forks, or a depth=1 clone of them),
 #     the whole directory is skipped. Re-applying LFS pointer diffs onto
 #     smudged binaries would conflict.
 #   - Remaining patches are applied with `git am --keep-cr`, falling back
@@ -52,6 +52,7 @@ declare -A REPO_PATHS=(
     [packages-apps-settings]="packages/apps/Settings"
     [vendor-oneplus-sm8450-common]="vendor/oneplus/sm8450-common"
     [vendor-realme-ferrari]="vendor/realme/ferrari"
+    [vendor-pixel-style]="vendor/pixel-style"
 )
 
 applied=0
@@ -130,7 +131,7 @@ for repo_dir in "$SCRIPT_DIR"/*/; do
         continue
     fi
 
-    # Forks already on ferrari-fixes (or a depth=1 clone of it) already
+    # Forks already on Evolution-X-v12.1-Android-17 (or a depth=1 clone) already
     # contain every patch in the tree. Re-applying LFS pointer diffs onto
     # smudged binaries conflicts. If the newest patch is in history, skip
     # the whole directory.

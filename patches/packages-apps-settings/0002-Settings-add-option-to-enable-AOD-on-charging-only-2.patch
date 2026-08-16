@@ -1,0 +1,44 @@
+From dc8c59d9dfaa8116cf1ed0f1cf2322777bcd3a80 Mon Sep 17 00:00:00 2001
+From: Pranav Vashi <neobuddy89@gmail.com>
+Date: Wed, 22 May 2024 15:56:13 +0900
+Subject: [PATCH 2/4] Settings: add option to enable AOD on charging only [2/2]
+
+Signed-off-by: Pranav Vashi <neobuddy89@gmail.com>
+---
+ res/values/evolution_strings.xml         | 4 ++++
+ res/xml/security_lockscreen_settings.xml | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/res/values/evolution_strings.xml b/res/values/evolution_strings.xml
+index a71fe77cf24..962b724d824 100644
+--- a/res/values/evolution_strings.xml
++++ b/res/values/evolution_strings.xml
+@@ -319,4 +319,8 @@
+     <string name="double_tap_title">Double tap</string>
+     <string name="doze_double_tap_title">Double tap to check phone</string>
+     <string name="doze_double_tap_summary">Pulse notifications by a double tap</string>
++
++    <!-- Doze on charge -->
++    <string name="doze_on_charge_title">Always show when charging</string>
++    <string name="doze_on_charge_summary">Display info when device is charging</string>
+ </resources>
+diff --git a/res/xml/security_lockscreen_settings.xml b/res/xml/security_lockscreen_settings.xml
+index c04a27bf82b..cf2f487bd22 100644
+--- a/res/xml/security_lockscreen_settings.xml
++++ b/res/xml/security_lockscreen_settings.xml
+@@ -102,6 +102,12 @@
+         settings:controller="com.android.settings.display.AmbientDisplayWhenToShowPreferenceController"
+         android:order="1000">
+ 
++        <org.evolution.settings.preferences.SecureSettingSwitchPreference
++            android:key="doze_on_charge"
++            android:title="@string/doze_on_charge_title"
++            android:summary="@string/doze_on_charge_summary"
++            android:defaultValue="false" />
++
+         <org.evolution.settings.preferences.SecureSettingSwitchPreference
+             android:key="pulse_on_new_tracks"
+             android:title="@string/pulse_on_new_tracks_title"
+-- 
+2.43.0
+

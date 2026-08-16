@@ -60,5 +60,6 @@ regenerate packages/apps/Evolver fdb4d6f5d454 "$OUT/packages-apps-evolver"
 regenerate packages/apps/Settings f075f75c3e09 "$OUT/packages-apps-settings"
 regenerate vendor/oneplus/sm8450-common 8023c6da2e99 "$OUT/vendor-oneplus-sm8450-common"
 regenerate vendor/realme/ferrari f16f79eb52ee "$OUT/vendor-realme-ferrari"
+regenerate vendor/pixel-style ff6f722e5797 "$OUT/vendor-pixel-style"
 
 echo "Patches regenerated under $OUT"

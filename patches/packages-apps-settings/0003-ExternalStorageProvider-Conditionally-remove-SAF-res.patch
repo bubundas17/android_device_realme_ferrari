@@ -1,0 +1,69 @@
+From 2345a1783cc0501636663b5780759d73671c73b5 Mon Sep 17 00:00:00 2001
+From: someone5678 <someone5678@users.noreply.github.com>
+Date: Sat, 1 Jun 2024 13:49:36 +0900
+Subject: [PATCH 3/4] ExternalStorageProvider: Conditionally remove SAF
+ restrictions [2/2]
+
+* Write title and summary based on  NoStorageRestrict module's descriptions.
+
+Ref:
+https://github.com/DanGLES3/NoStorageRestrict
+
+Change-Id: Ie62441f2c8e7ebaca3612100c79e7c24ebfb5b0e
+Signed-off-by: someone5678 <someone5678@users.noreply.github.com>
+---
+ res/values/evolution_strings.xml           | 4 ++++
+ res/xml/more_security_privacy_settings.xml | 7 +++++++
+ res/xml/security_advanced_settings.xml     | 7 +++++++
+ 3 files changed, 18 insertions(+)
+
+diff --git a/res/values/evolution_strings.xml b/res/values/evolution_strings.xml
+index 962b724d824..2094ef8ae9a 100644
+--- a/res/values/evolution_strings.xml
++++ b/res/values/evolution_strings.xml
+@@ -323,4 +323,8 @@
+     <!-- Doze on charge -->
+     <string name="doze_on_charge_title">Always show when charging</string>
+     <string name="doze_on_charge_summary">Display info when device is charging</string>
++
++    <!-- No storage restrict -->
++    <string name="no_storage_restrict_title">No storage restrict</string>
++    <string name="no_storage_restrict_summary">Remove the restriction when selecting folders through Storage Access Framework. Can be convenient in some cases but may lead to privacy leaks.</string>
+ </resources>
+diff --git a/res/xml/more_security_privacy_settings.xml b/res/xml/more_security_privacy_settings.xml
+index af3b5ecb22d..f8996733e80 100644
+--- a/res/xml/more_security_privacy_settings.xml
++++ b/res/xml/more_security_privacy_settings.xml
+@@ -249,4 +249,11 @@
+                 android:targetPackage="com.google.attestation.verifier" />
+     </Preference>
+ 
++    <org.evolution.settings.preferences.GlobalSettingSwitchPreference
++        android:order="96"
++        android:key="no_storage_restrict"
++        android:title="@string/no_storage_restrict_title"
++        android:summary="@string/no_storage_restrict_summary"
++        android:defaultValue="false"/>
++
+ </PreferenceScreen>
+diff --git a/res/xml/security_advanced_settings.xml b/res/xml/security_advanced_settings.xml
+index 2c0c0bb8bc8..81e4e2b782c 100644
+--- a/res/xml/security_advanced_settings.xml
++++ b/res/xml/security_advanced_settings.xml
+@@ -122,6 +122,13 @@
+         android:fragment="com.android.settings.security.MemtagPage"
+         settings:controller="com.android.settings.security.MemtagPagePreferenceController" />
+ 
++    <org.evolution.settings.preferences.GlobalSettingSwitchPreference
++        android:order="96"
++        android:key="no_storage_restrict"
++        android:title="@string/no_storage_restrict_title"
++        android:summary="@string/no_storage_restrict_summary"
++        android:defaultValue="false"/>
++
+     <!-- work profile security section -->
+     <PreferenceCategory
+         android:order="310"
+-- 
+2.43.0
+

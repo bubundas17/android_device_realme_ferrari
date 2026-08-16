@@ -1,4 +1,4 @@
-From ec93fb0b6e63313b326a6d7c25ee10e4c4bef8d3 Mon Sep 17 00:00:00 2001
+From 8bfca1c5c65227dc8c8a9eeb82c9a48d3f9c4c37 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Mon, 10 Aug 2026 10:11:36 +0000
 Subject: [PATCH 1/2] cameraserver: support a device extension static library
