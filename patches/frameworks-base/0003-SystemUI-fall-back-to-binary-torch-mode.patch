@@ -1,7 +1,7 @@
-From 00d961be09cc9188f6aef2c9f571aa7b51883359 Mon Sep 17 00:00:00 2001
+From c2ffe1e6224f93d2b5d514a7c92097c767f6a626 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 5 Aug 2026 16:35:41 +0000
-Subject: [PATCH 03/14] SystemUI: fall back to binary torch mode
+Subject: [PATCH 03/15] SystemUI: fall back to binary torch mode
 
 ---
  .../data/repository/FlashlightRepository.kt   | 19 +++++++++++++------

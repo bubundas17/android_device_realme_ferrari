@@ -1,7 +1,7 @@
-From 7b7cbc4697666515738d116c757f4a05388d7f24 Mon Sep 17 00:00:00 2001
+From b5f0ab6c86fec337594f32133e668bca4cf16fbe Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 5 Aug 2026 16:30:58 +0000
-Subject: [PATCH 02/14] SystemUI: use discrete brightness slider haptics
+Subject: [PATCH 02/15] SystemUI: use discrete brightness slider haptics
 
 ---
  .../brightness/ui/compose/BrightnessSlider.kt | 13 +++++++++-

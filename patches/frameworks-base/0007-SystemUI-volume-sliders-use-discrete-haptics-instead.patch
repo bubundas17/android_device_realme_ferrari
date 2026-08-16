@@ -1,7 +1,7 @@
-From 9090e6d6f4a0f41b2418f52e1b224fb02357e03b Mon Sep 17 00:00:00 2001
+From ae21b89ce7ef51569be73bf90b98abffbc75bf29 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Thu, 6 Aug 2026 19:58:33 +0000
-Subject: [PATCH 07/14] SystemUI: volume sliders: use discrete haptics instead
+Subject: [PATCH 07/15] SystemUI: volume sliders: use discrete haptics instead
  of continuous buzz
 
 Both volume sliders (the volume dialog and the new audio details panel) wired the MSDL slider haptics with VolumeHapticsConfigsProvider.continuousConfigs(), which plays a continuous drag texture while dragging - on this device it feels like the vibration motor stays on. Switch both to discreteConfigs() keyed to the stream's actual step size, matching the brightness slider which already got a ferrari-specific discrete config.

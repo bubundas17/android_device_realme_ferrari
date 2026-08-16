@@ -1,7 +1,7 @@
-From e1112e0898c6d505b794d2c89fce5d714836c153 Mon Sep 17 00:00:00 2001
+From d85b8d9d1dd5527768e48454f1bc41bec037dfb2 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 12 Aug 2026 06:45:10 +0000
-Subject: [PATCH 11/14] System server: add per-app banking compatibility preset
+Subject: [PATCH 11/15] System server: add per-app banking compatibility preset
 
 ---
  .../server/am/BroadcastController.java        | 50 ++++++++++++++++++-

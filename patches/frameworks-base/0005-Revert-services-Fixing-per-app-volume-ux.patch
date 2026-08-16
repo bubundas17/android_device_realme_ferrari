@@ -1,7 +1,7 @@
-From 999b8895108a7b119affa4f0e52f666d35e1092a Mon Sep 17 00:00:00 2001
+From 5927bc814a0b53569000fd1d4eef0e302ff744f6 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 5 Aug 2026 17:24:35 +0000
-Subject: [PATCH 05/14] Revert "services: Fixing per-app volume ux"
+Subject: [PATCH 05/15] Revert "services: Fixing per-app volume ux"
 
 This reverts commit 6a9eabc964c513616da02ed780f531071a10d0bd.
 ---

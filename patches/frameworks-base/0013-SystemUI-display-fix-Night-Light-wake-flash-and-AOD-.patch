@@ -1,7 +1,7 @@
-From 4e69d9de97e19f577a1de6b382c9edabe58067a2 Mon Sep 17 00:00:00 2001
+From 7ac34c4e84cdc4a2a160a60edf666f62c80b2675 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 12 Aug 2026 17:33:12 +0000
-Subject: [PATCH 13/14] SystemUI/display: fix Night Light wake flash and
+Subject: [PATCH 13/15] SystemUI/display: fix Night Light wake flash and
  AOD-off UDFPS pulse
 
 Re-apply color transforms on SCREEN_ON and wake to keyguard instead of

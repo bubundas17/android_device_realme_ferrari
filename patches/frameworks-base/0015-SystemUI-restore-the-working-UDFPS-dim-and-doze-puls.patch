@@ -1,0 +1,227 @@
+From 4bc6196fc108a41e143cb666fc27337f4f0b8052 Mon Sep 17 00:00:00 2001
+From: Bubun Das <bubundas17@gmail.com>
+Date: Sun, 16 Aug 2026 17:10:59 +0000
+Subject: [PATCH 15/15] SystemUI: restore the working UDFPS dim and doze pulse
+ path
+
+Later dim-defer and AOD-off pulse-wake changes stopped scans on this
+global-HBM panel. Keep the Aug 8 AOD dim behavior that authenticates.
+---
+ .../systemui/biometrics/UdfpsHelper.kt        | 90 +++++--------------
+ .../android/systemui/doze/DozeTriggers.java   | 21 +----
+ 2 files changed, 24 insertions(+), 87 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
+index a1a2f03be7bf..4e256c329037 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
+@@ -50,7 +50,7 @@ private const val DOZE_DIM_ALPHA = 0.98f
+ class UdfpsHelper(
+     private val context: Context,
+     private val windowManager: WindowManager,
+-    @Suppress("UNUSED_PARAMETER") private val shadeInteractor: ShadeInteractor,
++    private val shadeInteractor: ShadeInteractor,
+     @RequestReason val requestReason: Int,
+     private val brightnessMirrorShowingInteractor: BrightnessMirrorShowingInteractor,
+     private var view: View = View(context).apply {
+@@ -98,9 +98,6 @@ class UdfpsHelper(
+         addUpdateListener { animator ->
+             view.alpha = animator.animatedValue as Float
+             dimLayoutParams.alpha = animator.animatedValue as Float
+-            if (!view.isAttachedToWindow) {
+-                return@addUpdateListener
+-            }
+             try {
+                 windowManager.updateViewLayout(view, dimLayoutParams)
+             } catch (e: IllegalArgumentException) {
+@@ -115,22 +112,13 @@ class UdfpsHelper(
+         override fun onDisplayChanged(displayId: Int) {
+             if (displayId == Display.DEFAULT_DISPLAY && view.isAttachedToWindow) {
+                 brightnessToAlpha()
+-                if (view.isAttachedToWindow) {
+-                    try {
+-                        windowManager.updateViewLayout(view, dimLayoutParams)
+-                    } catch (e: IllegalArgumentException) {
+-                        Log.w(TAG, "UDFPS dim layer is no longer attached", e)
+-                    }
+-                }
++                windowManager.updateViewLayout(view, dimLayoutParams)
+             }
+         }
+ 
+         override fun onDisplayRemoved(displayId: Int) {}
+     }
+ 
+-    private var isDimLayerManaged: Boolean = false
+-    private var isBrightnessMirrorShowing: Boolean = false
+-
+     private fun interpolate(
+         value: Float,
+         fromMin: Int,
+@@ -193,59 +181,29 @@ class UdfpsHelper(
+         dimLayoutParams.alpha = targetAlpha
+     }
+ 
+-    private fun ensureDimLayerAttached() {
+-        if (view.isAttachedToWindow) {
+-            return
+-        }
+-        brightnessToAlpha()
+-        windowManager.addView(view, dimLayoutParams)
+-    }
+-
+-    private fun detachDimLayer() {
+-        alphaAnimator.cancel()
+-        if (view.isAttachedToWindow) {
+-            try {
+-                windowManager.removeView(view)
+-            } catch (e: IllegalArgumentException) {
+-                Log.w(TAG, "UDFPS dim layer was already removed", e)
+-            }
+-        }
+-        view.isVisible = false
+-    }
+-
+     fun addDimLayer() {
+-        if (isDimLayerManaged) {
+-            return
+-        }
+-        isDimLayerManaged = true
+         brightnessToAlpha()
++        windowManager.addView(view, dimLayoutParams)
+         displayManager.registerDisplayListener(
+             displayListener,
+             null,
+             DisplayManager.EVENT_TYPE_DISPLAY_BRIGHTNESS,
+         )
+-        // Keyguard: defer composing "Dim Layer for UDFPS" until finger-down so HWC does not
+-        // assert fingerprint_mask / OFP while the lock screen is idle (keeps Night Light).
+-        // Biometric prompt / enroll: attach immediately as before.
+-        if (!isKeyguard) {
+-            ensureDimLayerAttached()
+-            view.isVisible = true
+-        }
+     }
+ 
+     fun removeDimLayer() {
+-        detachDimLayer()
+-        if (isDimLayerManaged) {
+-            displayManager.unregisterDisplayListener(displayListener)
+-        }
+-        isDimLayerManaged = false
+-        isFingerDown = false
++        windowManager.removeView(view)
++        displayManager.unregisterDisplayListener(displayListener)
+     }
+ 
+     init {
+         view.repeatWhenAttached {
+             repeatOnLifecycle(Lifecycle.State.CREATED) {
+                 listenForBrightnessMirror(this)
++
++                if (isKeyguard) {
++                    listenForShadeTouchability(this)
++                }
+             }
+         }
+ 
+@@ -257,16 +215,13 @@ class UdfpsHelper(
+     private suspend fun listenForBrightnessMirror(scope: CoroutineScope): Job {
+         return scope.launch {
+             brightnessMirrorShowingInteractor.isShowing.collect {
+-                isBrightnessMirrorShowing = it
+-                if (isKeyguard) {
+-                    updateDimLayerVisibility()
+-                } else {
+-                    view.isVisible = !it
+-                }
++                view.isVisible = !it
+             }
+         }
+     }
+ 
++    private var isShadeTouchable: Boolean = false
++
+     private var isFingerDown: Boolean = false
+ 
+     fun setFingerDown(fingerDown: Boolean) {
+@@ -278,19 +233,20 @@ class UdfpsHelper(
+     }
+ 
+     private fun updateDimLayerVisibility() {
+-        // On keyguard, only compose the dim layer while the finger is down. Showing it earlier
+-        // (e.g. whenever the shade is touchable) asserts Oplus fingerprint_mask and engages the
+-        // global HBM/OFP color path for the whole panel.
+-        val shouldShow = isFingerDown && !isBrightnessMirrorShowing
+-        if (shouldShow) {
+-            ensureDimLayerAttached()
+-            view.isVisible = true
++        view.isVisible = isShadeTouchable || isFingerDown
++        if (view.isVisible) {
+             brightnessToAlpha()
+             alphaAnimator.cancel()
+             alphaAnimator.start()
+-        } else {
+-            // Detach so SurfaceFlinger/HWC drop the dim layer name and clear fingerprint_mask.
+-            detachDimLayer()
++        }
++    }
++
++    private suspend fun listenForShadeTouchability(scope: CoroutineScope): Job {
++        return scope.launch {
++            shadeInteractor.isShadeTouchable.collect {
++                isShadeTouchable = it
++                updateDimLayerVisibility()
++            }
+         }
+     }
+ }
+diff --git a/packages/SystemUI/src/com/android/systemui/doze/DozeTriggers.java b/packages/SystemUI/src/com/android/systemui/doze/DozeTriggers.java
+index 7eb9183ba6e3..19c86133fcce 100644
+--- a/packages/SystemUI/src/com/android/systemui/doze/DozeTriggers.java
++++ b/packages/SystemUI/src/com/android/systemui/doze/DozeTriggers.java
+@@ -411,10 +411,7 @@ public class DozeTriggers implements DozeMachine.Part {
+ 
+     private void gentleWakeUp(@DozeLog.Reason int reason) {
+         if (shouldVibrate(reason)) wakeVibrate();
+-        // ferrari/Oplus: with AOD off, doze pulses often leave a dim wallpaper-only
+-        // frame (lockscreen/UDFPS alpha 0) even though FP still authenticates.
+-        // Prefer a real interactive keyguard wake so clock + FP icon are visible.
+-        if (dozeInsteadOfWake(reason) && mConfig.alwaysOnEnabled(mUserTracker.getUserId())) {
++        if (dozeInsteadOfWake(reason)) {
+             requestPulse(reason, true, null);
+             return;
+         }
+@@ -430,14 +427,6 @@ public class DozeTriggers implements DozeMachine.Part {
+         mMachine.wakeUp(reason);
+     }
+ 
+-    /** Reasons that pulse to WITHOUT_UI / AUTH_UI and hide the lockscreen affordances. */
+-    private static boolean isSelectiveUiPulseReason(int reason) {
+-        return reason == DozeLog.REASON_SENSOR_UDFPS_LONG_PRESS
+-                || reason == DozeLog.REASON_SENSOR_QUICK_PICKUP
+-                || reason == DozeLog.PULSE_REASON_FINGERPRINT_PULSE_SHOW_AUTH_UI
+-                || reason == DozeLog.PULSE_REASON_FINGERPRINT_PULSE_SHOW_FULL_UI;
+-    }
+-
+     private void wakeVibrate() {
+         VibrationEffect effect = VibrationEffect.createWaveform(new long[] { 0, 100 }, -1);
+         if (mVibrator.areAllEffectsSupported(VibrationEffect.EFFECT_CLICK) ==
+@@ -621,14 +610,6 @@ public class DozeTriggers implements DozeMachine.Part {
+     private void requestPulse(final int reason, boolean performedProxCheck,
+             Runnable onPulseSuppressedListener) {
+         Assert.isMainThread();
+-        // With AOD off, selective-UI pulses (UDFPS / fingerprint auth) commonly
+-        // produce a dim wallpaper-only frame without the fingerprint icon on
+-        // this panel. Wake the interactive keyguard instead.
+-        if (isSelectiveUiPulseReason(reason)
+-                && !mConfig.alwaysOnEnabled(mUserTracker.getUserId())) {
+-            gentleWakeUp(reason);
+-            return;
+-        }
+         mDozeHost.extendPulse(reason);
+ 
+         final DozeMachine.State dozeState = mMachine.getState();
+-- 
+2.43.0
+

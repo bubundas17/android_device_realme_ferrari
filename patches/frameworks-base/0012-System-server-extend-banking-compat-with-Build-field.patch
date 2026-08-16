@@ -1,7 +1,7 @@
-From 54d8d3d2fa0fd7aea6ce63b13194b7b8339cc5a6 Mon Sep 17 00:00:00 2001
+From 64bbc7a037cf63ff3539be8240e83e024a2263c7 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 12 Aug 2026 07:27:33 +0000
-Subject: [PATCH 12/14] System server: extend banking compat with Build field
+Subject: [PATCH 12/15] System server: extend banking compat with Build field
  spoof
 
 Paytm and similar apps also read zygote-baked Build.IS_DEBUGGABLE /

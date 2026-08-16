@@ -1,7 +1,7 @@
-From cc15920be4ee7a50650b13df2184c2376b2acd6e Mon Sep 17 00:00:00 2001
+From 8176b49dc19167ded60420ecc96b58bbdf703035 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Sat, 8 Aug 2026 15:18:51 +0000
-Subject: [PATCH 10/14] SystemUI: dim AOD content near-black during UDFPS press
+Subject: [PATCH 10/15] SystemUI: dim AOD content near-black during UDFPS press
 
 While dozing the panel luminance comes from the AOD (LP1) mode, not from
 the backlight value, so the brightness LUT is not calibrated for it and

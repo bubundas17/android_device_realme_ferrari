@@ -1,7 +1,7 @@
-From b65c7afb03098d0d893547c9be24b38c99ed7fd8 Mon Sep 17 00:00:00 2001
+From 5eb349c0c51f80b086c57c19ab2b64828b489c74 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 5 Aug 2026 14:15:54 +0000
-Subject: [PATCH 01/14] multisensory: tune LRA slider feedback
+Subject: [PATCH 01/15] multisensory: tune LRA slider feedback
 
 ---
  .../repository/haptics/MultisensoryComposedEffect.java     | 7 +++++--

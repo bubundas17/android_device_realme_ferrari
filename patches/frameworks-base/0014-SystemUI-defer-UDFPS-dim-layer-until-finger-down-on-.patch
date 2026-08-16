@@ -1,7 +1,7 @@
-From 9a95500814e8f07275cf40a3533196847488c3e5 Mon Sep 17 00:00:00 2001
+From 77b786aaadd249bf85d3367b6c99e674dffa483b Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Fri, 14 Aug 2026 16:31:33 +0000
-Subject: [PATCH 14/14] SystemUI: defer UDFPS dim layer until finger-down on
+Subject: [PATCH 14/15] SystemUI: defer UDFPS dim layer until finger-down on
  keyguard
 
 Keep dim+HBM only for the press so idle lock screen does not assert
