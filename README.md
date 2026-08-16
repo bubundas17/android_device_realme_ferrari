@@ -40,9 +40,10 @@ working UDFPS path.
 
 ## Building
 
-Prerequisites: a full Evolution X source tree (repo sync from the Evolution X
-manifest plus the ferrari device/kernel/vendor repos), with
-`TARGET_RELEASE=cp2a` set.
+Prerequisites: a full Evolution X source tree. Copy
+`local_manifests/ferrari.xml` to `.repo/local_manifests/ferrari.xml` and
+`repo sync` — device, kernel, and proprietary vendor trees all come from
+`bubundas17` (no extract-files). Then set `TARGET_RELEASE=cp2a`.
 
 ```bash
 # from the ROM root
