@@ -1,0 +1,118 @@
+From dc705ae5761acb037537dd8d26009e79d16a574a Mon Sep 17 00:00:00 2001
+From: Bubun Das <bubundas17@gmail.com>
+Date: Sun, 16 Aug 2026 20:08:46 +0000
+Subject: [PATCH 4/4] Evolver: add Paytm to TrickyStore defaults and sync banking
+ targets
+
+Banking compatibility now keeps payment apps on the attestation
+path so Paytm can use the keybox when TEE is unprovisioned.
+---
+ res/values/evolution_strings.xml              |  6 +--
+ .../BankingCompatibilitySettings.kt           | 40 +++++++++++++++++++
+ .../miscellaneous/TrickyStoreAppSettings.kt   |  1 +
+ 3 files changed, 44 insertions(+), 3 deletions(-)
+
+diff --git a/res/values/evolution_strings.xml b/res/values/evolution_strings.xml
+index 7e73d92..81c08a5 100644
+--- a/res/values/evolution_strings.xml
++++ b/res/values/evolution_strings.xml
+@@ -1166,12 +1166,12 @@
+     <string name="spoofing_pixel_props_summary">Spoof selected apps as a Pixel device to unlock Pixel-exclusive features</string>
+     <string name="spoofing_app_specific_category">App-specific overrides</string>
+     <string name="banking_compatibility_title">Banking app compatibility</string>
+-    <string name="banking_compatibility_summary">Hide developer options, ADB, USB state, and debug build signals from selected apps</string>
+-    <string name="banking_compatibility_description">Select banking and payment apps that refuse to run when developer options, USB debugging, or a debuggable build is visible. The real device settings remain unchanged.</string>
++    <string name="banking_compatibility_summary">Hide developer options, ADB, USB state, and debug build signals, and use TrickyStore attestation for selected apps</string>
++    <string name="banking_compatibility_description">Select banking and payment apps that refuse to run when developer options, USB debugging, a debuggable build, or a broken hardware attestation is visible. The real device settings remain unchanged.</string>
+     <string name="banking_compatibility_none_configured">No apps selected</string>
+     <string name="banking_compatibility_count">%1$d apps protected</string>
+     <string name="banking_compatibility_empty_description">No installed apps match the current search and system-app filter.</string>
+-    <string name="banking_compatibility_footer">This compatibility preset also rewrites Build debug/signing fields inside the app process. It is independent of Play Integrity and TrickyStore — only target an app in TrickyStore if it actually requires hardware-backed attestation.</string>
++    <string name="banking_compatibility_footer">This preset also rewrites Build debug/signing fields and treats the app as a TrickyStore AUTO target so Keystore attestation can use the configured keybox when TEE is broken. Play Integrity Fix still needs its own config for Google Play checks.</string>
+     <string name="spoofing_photos_title">Google Photos</string>
+     <string name="spoofing_photos_summary">Spoof Google Photos as a Pixel XL</string>
+     <string name="spoofing_snap_title">Snapchat</string>
+diff --git a/src/org/evolution/settings/fragments/miscellaneous/BankingCompatibilitySettings.kt b/src/org/evolution/settings/fragments/miscellaneous/BankingCompatibilitySettings.kt
+index e0cccef..80d55e1 100644
+--- a/src/org/evolution/settings/fragments/miscellaneous/BankingCompatibilitySettings.kt
++++ b/src/org/evolution/settings/fragments/miscellaneous/BankingCompatibilitySettings.kt
+@@ -8,6 +8,7 @@ package org.evolution.settings.fragments.miscellaneous
+ import android.app.ActivityManager
+ import android.app.AxSandboxManager
+ import android.os.Bundle
++import android.provider.Settings
+ import android.view.LayoutInflater
+ import android.view.View
+ import android.view.ViewGroup
+@@ -225,6 +226,7 @@ private fun BankingCompatibilityContent(context: android.content.Context) {
+                                     sandboxManager?.setSpoofSettingEnabled(
+                                         packageName, BANKING_COMPATIBILITY, false)
+                                 }
++                                syncTrickyStoreTarget(context, packageName, false)
+                             }
+                             killPackages(activityManager, selectedPackages)
+                         }
+@@ -272,6 +274,7 @@ private fun BankingCompatibilityContent(context: android.content.Context) {
+                                         sandboxManager?.setSpoofSettingEnabled(
+                                             app.packageName, BANKING_COMPATIBILITY, enabled)
+                                     }
++                                    syncTrickyStoreTarget(context, app.packageName, enabled)
+                                     stopPackage(activityManager, app.packageName)
+                                 }
+                             },
+@@ -290,3 +293,40 @@ private fun BankingCompatibilityContent(context: android.content.Context) {
+         }
+     }
+ }
++
++/**
++ * Keep TrickyStore targets aligned with the banking preset. Payment apps such
++ * as Paytm generate their own Keystore keys and exit when TEE attestation is
++ * unprovisioned; AUTO lets TrickyStore fall back to the keybox.
++ *
++ * Defaults (GMS, Paytm, …) are never removed here so a reset of the banking
++ * list cannot strip required attestation targets.
++ */
++private fun syncTrickyStoreTarget(
++    context: android.content.Context,
++    packageName: String,
++    enabled: Boolean,
++) {
++    val resolver = context.contentResolver
++    val current = Settings.Secure.getString(resolver, TrickyStoreAppSettings.TARGET_KEY)
++        ?.lines()
++        ?.map { it.trim() }
++        ?.filter { it.isNotEmpty() }
++        ?.toMutableList()
++        ?: mutableListOf()
++
++    val names = current.map { it.trimEnd('?', '!', '-') }.toSet()
++    if (enabled) {
++        if (packageName !in names) {
++            current.add(packageName)
++        }
++    } else if (packageName !in TrickyStoreAppSettings.DEFAULT_TARGETS) {
++        current.removeAll { it.trimEnd('?', '!', '-') == packageName }
++    }
++
++    Settings.Secure.putString(
++        resolver,
++        TrickyStoreAppSettings.TARGET_KEY,
++        current.joinToString("\n"),
++    )
++}
+diff --git a/src/org/evolution/settings/fragments/miscellaneous/TrickyStoreAppSettings.kt b/src/org/evolution/settings/fragments/miscellaneous/TrickyStoreAppSettings.kt
+index bf62310..074d78e 100644
+--- a/src/org/evolution/settings/fragments/miscellaneous/TrickyStoreAppSettings.kt
++++ b/src/org/evolution/settings/fragments/miscellaneous/TrickyStoreAppSettings.kt
+@@ -113,6 +113,7 @@ class TrickyStoreAppSettings : SettingsPreferenceFragment() {
+             "com.google.android.safetycore",
+             "com.google.android.apps.walletnfcrel",
+             "com.google.android.apps.nbu.paisa.user",
++            "net.one97.paytm",
+         )
+         val DEFAULT_TARGET_MODES = mapOf(
+             // Revolut — cert gen (original EvoX default)
+-- 
+2.43.0
+

@@ -1,0 +1,102 @@
+From 308609a79581ba9241ade2433874575e24eb98ab Mon Sep 17 00:00:00 2001
+From: Bubun Das <bubundas17@gmail.com>
+Date: Sun, 16 Aug 2026 20:08:41 +0000
+Subject: [PATCH 16/16] TrickyStore: treat banking compatibility apps as AUTO targets
+
+Paytm generates its own Keystore keys and exits when TEE attestation
+is unprovisioned. Use the configured keybox for those packages.
+---
+ .../app/BankingCompatibilitySpoof.java        |  4 ++-
+ .../trickystore/TrickyStoreService.java       | 33 ++++++++++++++++---
+ .../wm/sandbox/SettingsSpoofController.java   |  3 +-
+ 3 files changed, 34 insertions(+), 6 deletions(-)
+
+diff --git a/core/java/android/app/BankingCompatibilitySpoof.java b/core/java/android/app/BankingCompatibilitySpoof.java
+index 7968fe9c953c..bc981ce7208a 100644
+--- a/core/java/android/app/BankingCompatibilitySpoof.java
++++ b/core/java/android/app/BankingCompatibilitySpoof.java
+@@ -31,7 +31,9 @@ import java.lang.reflect.Field;
+  * constants (notably {@link Build#IS_DEBUGGABLE}) into every forked app, and
+  * some payment apps also read those fields / related properties directly. When
+  * the preset is enabled for a package, rewrite the obvious debug/signing
+- * signals before application code runs.
++ * signals before application code runs. TrickyStore also treats the package as
++ * an AUTO attestation target so Keystore keygen can use the configured keybox
++ * when TEE is unprovisioned (Paytm exits otherwise).
+  *
+  * @hide
+  */
+diff --git a/core/java/android/security/trickystore/TrickyStoreService.java b/core/java/android/security/trickystore/TrickyStoreService.java
+index fe06a678fbbf..c0e23efb716b 100644
+--- a/core/java/android/security/trickystore/TrickyStoreService.java
++++ b/core/java/android/security/trickystore/TrickyStoreService.java
+@@ -514,8 +514,8 @@ public class TrickyStoreService {
+         maybeRefreshTargets();
+         ensureTeeStatus();
+         for (String pkg : packages) {
+-            Mode mode = mPackageModes.get(pkg);
+-            if (mode == Mode.SKIP) continue;
++            Mode mode = effectiveMode(pkg);
++            if (mode == null || mode == Mode.SKIP) continue;
+             if (mode == Mode.LEAF_HACK) return true;
+             if (mode == Mode.AUTO && !mTeeBroken) return true;
+         }
+@@ -527,14 +527,39 @@ public class TrickyStoreService {
+         maybeRefreshTargets();
+         ensureTeeStatus();
+         for (String pkg : packages) {
+-            Mode mode = mPackageModes.get(pkg);
+-            if (mode == Mode.SKIP) continue;
++            Mode mode = effectiveMode(pkg);
++            if (mode == null || mode == Mode.SKIP) continue;
+             if (mode == Mode.GENERATE) return true;
+             if (mode == Mode.AUTO && mTeeBroken) return true;
+         }
+         return false;
+     }
+ 
++    /**
++     * Banking compatibility apps need the same attestation path as an explicit
++     * AUTO target. Paytm and similar payment apps generate their own Keystore
++     * keys and exit when TEE attestation is unprovisioned.
++     */
++    private Mode effectiveMode(String pkg) {
++        Mode mode = mPackageModes.get(pkg);
++        if (mode != null) {
++            return mode;
++        }
++        return isBankingCompatibilityEnabled(pkg) ? Mode.AUTO : null;
++    }
++
++    private static boolean isBankingCompatibilityEnabled(String pkg) {
++        if (pkg == null) {
++            return false;
++        }
++        try {
++            IActivityManager am = ActivityManager.getService();
++            return am != null && am.isSandboxSpoofSettingEnabled(pkg, "banking_compatibility");
++        } catch (RemoteException e) {
++            return false;
++        }
++    }
++
+     private void maybeRefreshTargets() {
+         long now = System.currentTimeMillis();
+         if (now - mLastTargetsRefreshMs >= TARGETS_REFRESH_COOLDOWN_MS) {
+diff --git a/services/core/java/com/android/server/wm/sandbox/SettingsSpoofController.java b/services/core/java/com/android/server/wm/sandbox/SettingsSpoofController.java
+index 943f3405edcf..6fba68d67e7c 100644
+--- a/services/core/java/com/android/server/wm/sandbox/SettingsSpoofController.java
++++ b/services/core/java/com/android/server/wm/sandbox/SettingsSpoofController.java
+@@ -26,7 +26,8 @@ import java.util.Set;
+  * <p>The {@link #BANKING_COMPATIBILITY} preset enables the ADB/dev-option keys
+  * below plus USB sticky sanitization in {@code BroadcastController}. Targeted
+  * app processes also run {@code android.app.BankingCompatibilitySpoof} to rewrite
+- * zygote-baked {@code Build} debug/signing fields.
++ * zygote-baked {@code Build} debug/signing fields, and TrickyStore treats those
++ * packages as AUTO attestation targets.
+  */
+ public class SettingsSpoofController {
+ 
+-- 
+2.43.0
+
