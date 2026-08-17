@@ -9,6 +9,14 @@ include device/oneplus/sm8450-common/BoardConfigCommon.mk
 
 DEVICE_PATH := device/realme/ferrari
 
+# Optional KSU-Next + SuSFS boot pipeline (./build_ksu_boot.sh).
+# Command-line TARGET_KERNEL_SOURCE overrides are ignored by kati once
+# BoardConfig has assigned the path, so this flag must be set at parse time.
+ifeq ($(BUILD_KSU_BOOT),true)
+TARGET_KERNEL_SOURCE := out/ksu-ferrari/kernel
+TARGET_KERNEL_CONFIG_EXT += $(DEVICE_PATH)/ksu/ksu.config
+endif
+
 # HIDL
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/manifest.xml
 
