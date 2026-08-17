@@ -1,7 +1,7 @@
-From d13df2a31e5667e98251f34de0a7ee0d4cb344fc Mon Sep 17 00:00:00 2001
+From f81e852859f605bb43c901af5b55a111af96df33 Mon Sep 17 00:00:00 2001
 From: Atakan <ata.kaner03@gmail.com>
 Date: Fri, 6 Dec 2024 12:30:45 +0300
-Subject: [PATCH 1/4] sdm: Support Samsung FINGERPRINT_MASK DRM property
+Subject: [PATCH 1/5] sdm: Support Samsung FINGERPRINT_MASK DRM property
 
 Allow Samsung devices to enable their HBM mode when a dim layer
 is present.

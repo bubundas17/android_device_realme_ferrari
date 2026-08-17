@@ -6,12 +6,11 @@
 <resources>
 
     <!-- Whether to enable framework dimming for UDFPS -->
-    <!-- The panel uses global HBM only (no local HBM). With framework dimming
-         enabled, SystemUI composites a full-screen dim layer ("Dim Layer for
-         UDFPS") that keeps the area outside the sensor at its current
-         brightness while the sensor circle reaches full HBM brightness.
-         The LineageOS compositionengine treats it as a regular layer, so no
-         panel DIM_LAYER property / HBM is forced on lock/unlock transitions. -->
+    <!-- The panel uses global HBM only (no local HBM). SDM asserts
+         fingerprint_mask / OFP HBM when "Dim Layer for UDFPS" is composed
+         with non-zero alpha. SystemUI keeps that window attached on
+         keyguard at alpha 0, and snaps alpha on finger-down so HBM cannot
+         race ahead of the dim. -->
     <bool name="config_udfpsFrameworkDimming">true</bool>
 
 </resources>

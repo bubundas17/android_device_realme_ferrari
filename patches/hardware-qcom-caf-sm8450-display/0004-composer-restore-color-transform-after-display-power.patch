@@ -1,7 +1,7 @@
-From 84a5b44ba54a78ac57216e88a404fe64437c6cdc Mon Sep 17 00:00:00 2001
+From 306e03db8d2d22252d75d15cb95c683781d4c761 Mon Sep 17 00:00:00 2001
 From: Bubun Das <bubundas17@gmail.com>
 Date: Wed, 12 Aug 2026 17:33:12 +0000
-Subject: [PATCH 4/4] composer: restore color transform after display power-on
+Subject: [PATCH 4/5] composer: restore color transform after display power-on
 
 Restoring PCC before SetDisplayState is lost when the panel powers up,
 causing a cold Night Light flash on wake. Restore after the power mode

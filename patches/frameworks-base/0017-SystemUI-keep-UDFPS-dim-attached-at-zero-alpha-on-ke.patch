@@ -1,0 +1,166 @@
+From 66425b5d46a5faf5ce4de1ecadeb3e3f200caf7f Mon Sep 17 00:00:00 2001
+From: Bubun Das <bubundas17@gmail.com>
+Date: Mon, 17 Aug 2026 16:43:12 +0000
+Subject: [PATCH] SystemUI: keep UDFPS dim attached at zero alpha on keyguard
+
+Idle lockscreen was composing the dim at compensation alpha, which
+asserted panel HBM on every lock/unlock. Keep the window in the tree
+and snap alpha on press so HBM cannot race addView.
+---
+ .../systemui/biometrics/UdfpsHelper.kt        | 86 +++++++++++++------
+ 1 file changed, 58 insertions(+), 28 deletions(-)
+
+diff --git a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
+index 4e256c329037..a00ee6ae7da5 100644
+--- a/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
++++ b/packages/SystemUI/src/com/android/systemui/biometrics/UdfpsHelper.kt
+@@ -50,7 +50,7 @@ private const val DOZE_DIM_ALPHA = 0.98f
+ class UdfpsHelper(
+     private val context: Context,
+     private val windowManager: WindowManager,
+-    private val shadeInteractor: ShadeInteractor,
++    @Suppress("UNUSED_PARAMETER") private val shadeInteractor: ShadeInteractor,
+     @RequestReason val requestReason: Int,
+     private val brightnessMirrorShowingInteractor: BrightnessMirrorShowingInteractor,
+     private var view: View = View(context).apply {
+@@ -110,10 +110,14 @@ class UdfpsHelper(
+         override fun onDisplayAdded(displayId: Int) {}
+ 
+         override fun onDisplayChanged(displayId: Int) {
+-            if (displayId == Display.DEFAULT_DISPLAY && view.isAttachedToWindow) {
+-                brightnessToAlpha()
+-                windowManager.updateViewLayout(view, dimLayoutParams)
++            if (displayId != Display.DEFAULT_DISPLAY || !view.isAttachedToWindow) {
++                return
++            }
++            if (isKeyguard && !shouldApplyKeyguardDim()) {
++                return
+             }
++            brightnessToAlpha()
++            updateDimLayout()
+         }
+ 
+         override fun onDisplayRemoved(displayId: Int) {}
+@@ -176,13 +180,36 @@ class UdfpsHelper(
+         Log.i(TAG, "Dim Layer Alpha: $targetAlpha")
+ 
+         alphaAnimator.setFloatValues(view.alpha, targetAlpha)
+-        // Set the dim for both the view and the layout
+-        view.alpha = targetAlpha
+-        dimLayoutParams.alpha = targetAlpha
++        applyDimAlpha(targetAlpha)
++    }
++
++    private fun applyDimAlpha(alpha: Float) {
++        alphaAnimator.cancel()
++        view.alpha = alpha
++        dimLayoutParams.alpha = alpha
++    }
++
++    private fun updateDimLayout() {
++        if (!view.isAttachedToWindow) {
++            return
++        }
++        try {
++            windowManager.updateViewLayout(view, dimLayoutParams)
++        } catch (e: IllegalArgumentException) {
++            Log.w(TAG, "UDFPS dim layer is no longer attached", e)
++        }
+     }
+ 
+     fun addDimLayer() {
+-        brightnessToAlpha()
++        // Keep the dim window in the tree for the overlay lifetime so press is an
++        // alpha update, not addView. Keyguard stays at alpha 0 until finger-down
++        // so SDM/kernel do not enable panel HBM on idle lock/unlock.
++        if (isKeyguard) {
++            applyDimAlpha(0f)
++        } else {
++            brightnessToAlpha()
++        }
++        view.isVisible = true
+         windowManager.addView(view, dimLayoutParams)
+         displayManager.registerDisplayListener(
+             displayListener,
+@@ -192,6 +219,8 @@ class UdfpsHelper(
+     }
+ 
+     fun removeDimLayer() {
++        alphaAnimator.cancel()
++        isFingerDown = false
+         windowManager.removeView(view)
+         displayManager.unregisterDisplayListener(displayListener)
+     }
+@@ -200,10 +229,6 @@ class UdfpsHelper(
+         view.repeatWhenAttached {
+             repeatOnLifecycle(Lifecycle.State.CREATED) {
+                 listenForBrightnessMirror(this)
+-
+-                if (isKeyguard) {
+-                    listenForShadeTouchability(this)
+-                }
+             }
+         }
+ 
+@@ -215,12 +240,17 @@ class UdfpsHelper(
+     private suspend fun listenForBrightnessMirror(scope: CoroutineScope): Job {
+         return scope.launch {
+             brightnessMirrorShowingInteractor.isShowing.collect {
+-                view.isVisible = !it
++                isBrightnessMirrorShowing = it
++                if (isKeyguard) {
++                    updateKeyguardDim()
++                } else {
++                    view.isVisible = !it
++                }
+             }
+         }
+     }
+ 
+-    private var isShadeTouchable: Boolean = false
++    private var isBrightnessMirrorShowing: Boolean = false
+ 
+     private var isFingerDown: Boolean = false
+ 
+@@ -229,24 +259,24 @@ class UdfpsHelper(
+             return
+         }
+         isFingerDown = fingerDown
+-        updateDimLayerVisibility()
++        updateKeyguardDim()
+     }
+ 
+-    private fun updateDimLayerVisibility() {
+-        view.isVisible = isShadeTouchable || isFingerDown
+-        if (view.isVisible) {
+-            brightnessToAlpha()
+-            alphaAnimator.cancel()
+-            alphaAnimator.start()
+-        }
++    private fun shouldApplyKeyguardDim(): Boolean {
++        return isFingerDown && !isBrightnessMirrorShowing
+     }
+ 
+-    private suspend fun listenForShadeTouchability(scope: CoroutineScope): Job {
+-        return scope.launch {
+-            shadeInteractor.isShadeTouchable.collect {
+-                isShadeTouchable = it
+-                updateDimLayerVisibility()
+-            }
++    private fun updateKeyguardDim() {
++        if (!view.isAttachedToWindow) {
++            return
++        }
++        view.isVisible = true
++        if (shouldApplyKeyguardDim()) {
++            // Snap alpha so HBM and the dim pixels share the next composition.
++            brightnessToAlpha()
++        } else {
++            applyDimAlpha(0f)
+         }
++        updateDimLayout()
+     }
+ }
+-- 
+2.43.0
+

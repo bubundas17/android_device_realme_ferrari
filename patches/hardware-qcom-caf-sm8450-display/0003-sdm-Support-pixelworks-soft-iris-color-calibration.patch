@@ -1,7 +1,7 @@
-From bf070c2a9af2fad4d0c060dc0d5c81fbc40ee3d9 Mon Sep 17 00:00:00 2001
+From 6f317f316512c1f531d25b9c35774807cf16dd3b Mon Sep 17 00:00:00 2001
 From: pjgowtham <pjgowtham@gmail.com>
 Date: Thu, 8 May 2025 00:16:06 +0530
-Subject: [PATCH 3/4] sdm: Support pixelworks soft iris color calibration
+Subject: [PATCH 3/5] sdm: Support pixelworks soft iris color calibration
 
 Fixes display color calibration with devices that support
 pixelworks soft-iris feature. While switching color modes with

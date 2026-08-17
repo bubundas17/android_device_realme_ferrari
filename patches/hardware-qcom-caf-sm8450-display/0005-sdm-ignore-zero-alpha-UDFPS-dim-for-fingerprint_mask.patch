@@ -1,0 +1,36 @@
+From 0da38de37e8dd06b84fad2717684537536b9b366 Mon Sep 17 00:00:00 2001
+From: Bubun Das <bubundas17@gmail.com>
+Date: Mon, 17 Aug 2026 16:43:12 +0000
+Subject: [PATCH 5/5] sdm: ignore zero-alpha UDFPS dim for fingerprint_mask
+
+The dim layer name still matches when idle alpha is 0. Require a
+non-zero plane alpha before asserting DIM_LAYER so lockscreen HBM
+does not toggle on lock/unlock.
+---
+ sdm/libs/core/drm/hw_device_drm.cpp | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/sdm/libs/core/drm/hw_device_drm.cpp b/sdm/libs/core/drm/hw_device_drm.cpp
+index 04ae076386..db302ef820 100644
+--- a/sdm/libs/core/drm/hw_device_drm.cpp
++++ b/sdm/libs/core/drm/hw_device_drm.cpp
+@@ -1448,9 +1448,14 @@ void HWDeviceDRM::SetupAtomic(Fence::ScopedRef &scoped_ref, HWLayersInfo *hw_lay
+   if (IsPrimaryDisplay()) {
+     uint32_t mask_state = 0;
+     for (uint32_t i = 0; i < hw_layer_count; i++) {
+-      const std::string &name = hw_layers_info->hw_layers[i].layer_name;
++      Layer &layer = hw_layers_info->hw_layers.at(i);
++      const std::string &name = layer.layer_name;
+       if (name.find(UDFPS_DIM_LAYER_NAME) != std::string::npos) {
+-        mask_state |= OPLUS_OFP_PROPERTY_DIM_LAYER;
++        // Alpha 0 still matches the layer name. Ignore it so idle lockscreen
++        // does not assert DIM_LAYER / panel HBM.
++        if (layer.plane_alpha > 0) {
++          mask_state |= OPLUS_OFP_PROPERTY_DIM_LAYER;
++        }
+       } else if (name.find(UDFPS_TOUCHED_LAYER_NAME) != std::string::npos) {
+         mask_state |= OPLUS_OFP_PROPERTY_FINGERPRESS_LAYER;
+       }
+-- 
+2.43.0
+

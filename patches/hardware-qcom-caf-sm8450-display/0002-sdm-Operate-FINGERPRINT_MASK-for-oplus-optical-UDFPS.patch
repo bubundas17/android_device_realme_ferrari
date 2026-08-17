@@ -1,7 +1,7 @@
-From f5c5669935eb1ea9eb05f8cd9684b4bcb23b9454 Mon Sep 17 00:00:00 2001
+From f77323fea695aa607cf8c6d54f457240875f98e6 Mon Sep 17 00:00:00 2001
 From: pjgowtham <pjgowtham@gmail.com>
 Date: Thu, 22 May 2025 12:46:34 +0530
-Subject: [PATCH 2/4] sdm: Operate FINGERPRINT_MASK for oplus optical UDFPS
+Subject: [PATCH 2/5] sdm: Operate FINGERPRINT_MASK for oplus optical UDFPS
 
 Even though oplus calls the connector property hbm_enable, its
 function is not just limited to operating HBM. It's also responsible
